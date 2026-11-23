@@ -8,6 +8,8 @@ from pathlib import Path
 import numpy as np
 
 from capture_processing.utils.fit_metrics import FIT_FILES, metric, reprojection_errors
+from capture_processing.utils.mamma import resolve_mamma_repo
+from capture_processing.utils.smplx_hands import MARKER, mamma_hands_mean
 
 
 def evaluate(subject: Path, params_path: Path, kind="smplx"):
@@ -23,11 +25,20 @@ def evaluate(subject: Path, params_path: Path, kind="smplx"):
                 betas = betas[None]
             elif betas.shape[0] != 1:
                 betas = np.median(betas, axis=0, keepdims=True).astype(np.float32)
+            left, right = pose[:, 75:120], pose[:, 120:165]
+            if MARKER in canonical.files and bool(canonical[MARKER]):
+                # Exported in the flat-hand convention (see smplx_hands).
+                run_args = json.loads((params_path.parent / 'run_args.json').read_text())
+                models = Path(run_args.get('smplx_models') or '')
+                mean_left, mean_right = (mamma_hands_mean(models=models) if (models / 'smplx/SMPLX_NEUTRAL.npz').is_file()
+                                         else mamma_hands_mean(resolve_mamma_repo(None)))
+                left = (left.astype(np.float32) + mean_left).astype(np.float32)
+                right = (right.astype(np.float32) + mean_right).astype(np.float32)
             if not (np.array_equal(canonical['global_orient'], pose[:, :3]) and
                     np.array_equal(canonical['body_pose'], pose[:, 3:66]) and
                     np.array_equal(canonical['jaw_pose'], pose[:, 66:69]) and
-                    np.array_equal(canonical['left_hand_pose'], pose[:, 75:120]) and
-                    np.array_equal(canonical['right_hand_pose'], pose[:, 120:165]) and
+                    np.array_equal(canonical['left_hand_pose'], left) and
+                    np.array_equal(canonical['right_hand_pose'], right) and
                     np.array_equal(canonical['betas'], betas) and
                     np.all(canonical['expression'] == 0) and
                     np.array_equal(canonical['transl'], upstream['smplx_translation'])):

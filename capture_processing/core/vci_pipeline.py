@@ -300,6 +300,12 @@ def _run_dataset_creation(args: argparse.Namespace) -> Path:
         log["smplx_media_signature"] = current_fit_signature
         mark_step_complete(log, "smplx_created")
         save_processing_log(out_root, log)
+    from ..utils.smplx_hands import needs_hand_conversion, normalize_subject_hands
+    if ('smplx_created' in log['steps_completed'] and getattr(args, 'smplx_source', 'mamma') == 'mamma'
+            and needs_hand_conversion(out_root)):
+        from ..utils.mamma import resolve_mamma_repo
+        normalize_subject_hands(out_root, resolve_mamma_repo(getattr(args, 'mamma_repo_path', None)),
+                                getattr(args, 'mamma_out_tag', 'vci'))
 
     if "metadata_written" in missing_steps:
         (out_root / "missing_img_files.txt").write_text(

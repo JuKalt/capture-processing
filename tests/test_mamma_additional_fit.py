@@ -24,6 +24,10 @@ class AdditionalMammaFitTests(unittest.TestCase):
         self.subject.mkdir()
         self.repo = Path(temporary.name) / 'repo'
         self.repo.mkdir()
+        models = self.repo / 'data/body_models/smplx_locked_head/smplx'
+        models.mkdir(parents=True)
+        np.savez(models / 'SMPLX_NEUTRAL.npz', hands_meanl=np.full(45, .1, np.float32),
+                 hands_meanr=np.full(45, -.1, np.float32))
         self.args = SimpleNamespace(smplx_source='mamma', mamma_repo_path=None, mamma_out_tag='vci',
             mamma_python='python', mamma_force=False, mamma_confidence_fit=True, semantic_parsing=False, device='cpu', mhr_source='none')
         self.fields = {'global_orient': np.zeros((2, 3)), 'transl': np.zeros((2, 3)),

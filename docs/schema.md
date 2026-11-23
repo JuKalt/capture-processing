@@ -52,7 +52,11 @@ fit coverage and the manifest's source/fit frame IDs separately.
   `body_pose` `[T,63]`, `jaw_pose` `[T,3]`, hands `[T,45]`, `expression` `[T,10]`,
   and shared `betas` `[1,B]`. Rotations are axis-angle in radians. New exports
   include integer `frame_ids`; legacy archives use row indices. The MAMMA export
-  currently uses zero expression and does not export eye rotations.
+  currently uses zero expression and does not export eye rotations. Hand poses
+  are relative to a flat hand (build SMPL-X with `flat_hand_mean=True`); such
+  archives contain `flat_hand_mean=True`. MAMMA fits relative to SMPL-X's mean
+  hand, so the export adds that mean. Older MAMMA exports without the key are
+  converted on the next pipeline run, without refitting.
 - `smpl_params_confidence.npz`: the independent confidence-filtered variant.
 - `mhr_params.npz`: SAM3D estimates with explicit `frame_ids`, view counts,
   reference cameras, checkpoint/completion state and diagnostics. Model fields

@@ -85,9 +85,11 @@ def confidence_fit_complete(subject, repo=None, tag='vci'):
     import numpy as np
     try:
         manifest = _read_manifest(subject)
+        from capture_processing.utils.smplx_hands import hands_flat
         with np.load(subject / 'smpl_params.npz') as default:
             count = len(default['transl'])
-        if not manifest.get('complete') or not valid_smplx(subject / PARAMS, count):
+        if (not manifest.get('complete') or not valid_smplx(subject / PARAMS, count)
+                or not hands_flat(subject / PARAMS)):
             return False
         if repo is not None and inputs(subject, repo, tag)[-1] != manifest['signature']:
             return False
@@ -145,6 +147,7 @@ def _ensure_confidence_fit(subject, args):
     import numpy as np
     from capture_processing.utils.mamma import resolve_mamma_repo, _mamma_subprocess_env, _apply_mamma_device_env
     from capture_processing.utils.smplx_utils import save_mamma_smpl_params
+    from capture_processing.utils.smplx_hands import convert_mamma_hands, hands_flat, mamma_hands_mean
     from capture_processing.utils.fit_metrics import prepare_smplx_fit_diagnostics
     subject = Path(subject).resolve()
     repo = resolve_mamma_repo(getattr(args, 'mamma_repo_path', None))
@@ -224,8 +227,10 @@ def _ensure_confidence_fit(subject, args):
         if visualization.exists():
             shutil.rmtree(visualization)
     params = folder / 'smplx_params_body_id-00.npz'
-    if changed(subject / PARAMS) or not valid_smplx(subject / PARAMS, count):
+    if (changed(subject / PARAMS) or not valid_smplx(subject / PARAMS, count)
+            or not hands_flat(subject / PARAMS)):
         save_mamma_smpl_params(subject, params, filename=PARAMS)
+        convert_mamma_hands(subject / PARAMS, mamma_hands_mean(repo))
     if not valid_smplx(subject / PARAMS, count):
         raise ValueError('Invalid confidence-filtered SMPL-X export')
     record([subject / PARAMS])

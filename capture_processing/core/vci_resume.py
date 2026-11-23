@@ -220,7 +220,9 @@ def quick_conversion_complete(args, output, log):
         import numpy as np
         with np.load(output / "smpl_params.npz", allow_pickle=False) as data:
             frame_count = data["transl"].shape[0]
+        from ..utils.smplx_hands import needs_hand_conversion
         return (frame_count > 0 and valid_smplx(output / "smpl_params.npz", frame_count)
+                and not needs_hand_conversion(output)
                 and valid_json(output / "calibration.json")
                 and valid_json(output / "camera_id_mapping.json")
                 and (output / "missing_img_files.txt").is_file())

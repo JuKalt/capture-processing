@@ -247,6 +247,10 @@ def _process_thuman_subject(
         mamma_confidence_fit=mamma_confidence_fit,
         device=device,
     )
+    from ..utils.smplx_hands import needs_hand_conversion, normalize_subject_hands
+    if smplx_source == 'mamma' and needs_hand_conversion(target):
+        from ..utils.mamma import resolve_mamma_repo
+        normalize_subject_hands(target, resolve_mamma_repo(mamma_repo_path), mamma_out_tag)
 
     convert_subject_smplx_to_mhr(target, smplx_mhr_options)
     maybe_create_mhr_params(
