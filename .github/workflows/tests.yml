@@ -14,8 +14,6 @@ jobs:
           repository: ${{ vars.MULTIVIEW_DATA_REPOSITORY || format('{0}/multiview-data', github.repository_owner) }}
           ref: ${{ vars.MULTIVIEW_DATA_REF || 'main' }}
           path: multiview-data
-          # Use a scoped read token while Multiview Data is private.
-          token: ${{ secrets.VCI_CI_READ_TOKEN || github.token }}
           persist-credentials: false
 
       - uses: actions/setup-python@v5

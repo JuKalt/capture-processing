@@ -6,6 +6,10 @@ Turn a raw VCI capture into calibrated multiview media, body fits, metrics and
 semantic annotations. The external reprocessing entry point accepts calibrated
 observations from Multiview Data and runs the same pipeline.
 
+![RGB capture, rough and detailed color-coded segmentation, segmentation confidence, and standard SMPL-X and MHR body fits.](docs/media/vci-capture-processing.gif)
+
+*One synchronized capture: 34 color cameras, 252 frames at 25 fps (10.1 seconds). The GIF shows a 4.2-second excerpt from one camera.*
+
 For a standalone install on Linux, run `./install.sh` with Conda on `PATH`.
 See [setup](docs/setup.md) for GPU requirements, authorized models, and install
 modes. If you ran the full VCI Suite installer, skip this step.
