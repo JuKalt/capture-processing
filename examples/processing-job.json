@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "shared_run_root": "/data/runs/capture-processing",
+  "output_root": "/data/outputs/capture-processing",
+  "subjects": [
+    "example-subject"
+  ],
+  "task": {
+    "command": [
+      "{python}",
+      "scripts/datasets/process_vci_subject.py",
+      "/data/raw-captures",
+      "{subject}",
+      "{output_dir}",
+      "--",
+      "--workers",
+      "4",
+      "--resume-validation",
+      "quick",
+      "--mamma-python",
+      "conda run -n mamma python",
+      "--mhr-python",
+      "/opt/capture-processing/external/sam3d-body-rerun/.pixi/envs/dev/bin/python"
+    ],
+    "output_layout": "root"
+  },
+  "machines": [
+    {
+      "name": "local",
+      "host": "localhost",
+      "transport": "local",
+      "cwd": "/opt/capture-processing",
+      "python": "/opt/miniforge/envs/vci-dataset/bin/python",
+      "gpus": [
+        {
+          "id": 0,
+          "workers": 1
+        }
+      ]
+    }
+  ]
+}

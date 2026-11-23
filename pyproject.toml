@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "capture-processing"
+version = "0.1.0"
+description = "Processing for captured multiview recordings"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["multiview-data>=0.1,<0.2", "numpy>=1.24,<3", "Pillow>=10,<13", "pillow-avif-plugin>=1.4,<2", "PyYAML>=6,<7", "tqdm>=4.66,<5", "python-dotenv>=1,<2"]
+
+[project.optional-dependencies]
+native = ["multiview-data[native]>=0.1,<0.2"]
+test = ["torch>=2.5,<3", "scipy>=1.10,<2", "opencv-python-headless>=4.8,<5", "h5py>=3,<4"]
+
+[project.scripts]
+capture-process = "process_dataset:entrypoint"
+capture-reprocess = "capture_processing.reprocess:main"
+capture-validate = "capture_processing.tools.validate_subject:main"
+
+[tool.setuptools]
+py-modules = ["process_dataset"]
+
+[tool.setuptools.packages.find]
+include = ["capture_processing*"]

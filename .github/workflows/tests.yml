@@ -1,0 +1,30 @@
+name: Tests
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: candidate
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ vars.MULTIVIEW_DATA_REPOSITORY || format('{0}/multiview-data', github.repository_owner) }}
+          ref: ${{ vars.MULTIVIEW_DATA_REF || 'main' }}
+          path: multiview-data
+          # Use a scoped read token while Multiview Data is private.
+          token: ${{ secrets.VCI_CI_READ_TOKEN || github.token }}
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - run: python -m pip install 'torch>=2.5,<3' --index-url https://download.pytorch.org/whl/cpu
+      - run: python -m pip install './multiview-data' './candidate[test]'
+      - run: python -m unittest discover -v
+        working-directory: candidate
+        env:
+          VCI_TEST_INTEGRATION: '0'
